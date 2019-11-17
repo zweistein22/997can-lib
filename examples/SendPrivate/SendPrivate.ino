@@ -23,5 +23,5 @@ void loop()
 		CAN_Begin();
 		delay(1000);
 	}
-	delay(100);
+	delay(10);
 }

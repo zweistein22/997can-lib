@@ -2,7 +2,7 @@
 #include <mcp_can.h>
 #include <EngineMsmt.h>
 #include "Can997.h"
-//#define DEBUGSERIAL Serial
+#define DEBUGSERIAL Serial
 
 #ifdef __AVR__
 #ifndef __AVR_ATmega2560__
@@ -24,9 +24,11 @@ long unsigned int rxId;
 char msgString[] = "                            ";
 #endif
 
+
+
 #define CAN_EXTENDED 0x80000000
-#define CAN_PRIVATE1 0x7fc    //|CAN_EXTENDED // MUST BE EVEN!!
-#define CAN_PRIVATE2 (CAN_PRIVATE1|1) //|CAN_EXTENDED) 
+#define CAN_PRIVATE1 (0x17fc|CAN_EXTENDED)   // MUST BE EVEN!!
+#define CAN_PRIVATE2 (CAN_PRIVATE1|1)  
 #define CAN_ANTRIEB242 0x242
 #define CAN_ANTRIEB245 0x245
 #define CAN_ANTRIEB442 0x442
@@ -49,6 +51,9 @@ INT8U CAN_Begin() {
 		rv = MCP2515_FAIL;
 #ifdef MCP_STDERR
 		MCP_STDERR.println("MCP2515_FAIL");
+#ifdef DEBUGSERIAL
+		DEBUGSERIAL.println("MCP2515_FAIL");
+#endif
 #endif
 		return rv;
 	}
@@ -62,7 +67,9 @@ INT8U CAN_Begin() {
 		return rv;
 	}
 	pinMode(CAN0_INT, INPUT);								// Configuring pin for /INT input
-	rv=CAN0.init_Mask(0, 0, ((long)CAN_ANTRIEB245&CAN_PRIVATE2) <<16);      // there are 2 mask in mcp2515, you need to set both of them
+	long mask = ((long)0x7FF) << 16;
+	if (CAN_PRIVATE1&CAN_EXTENDED) {mask= 0x1FFFFFFF;}
+	rv = CAN0.init_Mask(0, (CAN_PRIVATE1&CAN_EXTENDED)?1:0, mask);      // there are 2 mask in mcp2515, you need to set both of them
 	if (rv != CAN_OK) {
 #ifdef MCP_STDERR
 		MCP_STDERR.print("CAN0.init_Mask(0, 0, ((long)CAN_ANTRIEB245&CAN_PRIVATE2) <<16) error:");
@@ -70,16 +77,15 @@ INT8U CAN_Begin() {
 #endif
 		return rv;
 	}
+	CAN0.init_Filt(0, (CAN_PRIVATE1&CAN_EXTENDED) ? 1 : 0, (CAN_PRIVATE1&CAN_EXTENDED) ? (long)CAN_PRIVATE1 : (long)CAN_PRIVATE1 << 16);
+	CAN0.init_Filt(1, (CAN_PRIVATE2&CAN_EXTENDED) ? 1 : 0, (CAN_PRIVATE2&CAN_EXTENDED) ? (long)CAN_PRIVATE2 : (long)CAN_PRIVATE2 << 16);
 
-	CAN0.init_Filt(0, 0, ((long)CAN_ANTRIEB245)<<16);		// there are 6 filter in mcp2515
-	CAN0.init_Filt(1, 0, ((long)CAN_PRIVATE2) <<16);      // there are 6 filter in mcp2515
-
-	CAN0.init_Mask(1, 0, ((long)CAN_PRIVATE1&CAN_ANTRIEB242&CAN_ANTRIEB442) << 16); // only address containing 0x40 are allowed, 0x640, 0x440, 0x240, 0x241,0x24F,...
-	CAN0.init_Filt(2, 0, ((long)CAN_PRIVATE1)<<16);                          // there are 6 filter in mcp2515
-	CAN0.init_Filt(3, 0, ((long)CAN_ANTRIEB242)<<16);
-	CAN0.init_Filt(4, 0, ((long)CAN_ANTRIEB442)<< 16);
- //   CAN0.init_Filt(5, 0, ((long)CAN_ANTRIEB442 << 16));
-//	CAN0.init_Filt(6, 0, ((long)CAN_ANTRIEB442 << 16));
+	CAN0.init_Mask(1, 0, ((long)0x7FF) << 16); // only address containing 0x40 are allowed, 0x640, 0x440, 0x240, 0x241,0x24F,...
+	CAN0.init_Filt(2, 0, ((long)CAN_ANTRIEB242) << 16);
+	CAN0.init_Filt(3, 0, ((long)CAN_ANTRIEB245) << 16);
+	CAN0.init_Filt(4, 0, ((long)CAN_ANTRIEB442) << 16);
+    CAN0.init_Filt(5, 0, ((long)CAN_ANTRIEB442) << 16);
+	CAN0.init_Filt(6, 0, ((long)CAN_ANTRIEB442) << 16);
 	// there are 6 filter in mcp2515
 	return rv;
 }
@@ -138,6 +144,7 @@ INT8U sendCan() {
 			data[6] = Engine.b[14];
 			data[7] = Engine.b[15];
 			sndStat = CAN0.sendMsgBuf(CAN_PRIVATE2, 8, data);
+			
 			if (sndStat != CAN_OK) {
 #ifdef MCP_STDERR
 				MCP_STDERR.print("Error Sending Message CAN_PRIVATE2 Id:0x");
