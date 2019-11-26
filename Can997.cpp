@@ -2,7 +2,7 @@
 #include <mcp_can.h>
 #include <EngineMsmt.h>
 #include "Can997.h"
-#define DEBUGSERIAL Serial
+//#define DEBUGSERIAL Serial
 
 #ifdef __AVR__
 #ifndef __AVR_ATmega2560__
@@ -106,6 +106,8 @@ INT8U sendCan() {
 	}
 	data[0] = 0x02;// ACD_1  2 = Normal_Prog_aktiv
 	//sndStat= CAN0.sendMsgBuf(CAN_ANTRIEB442, 1, data);
+
+	//return sndStat; // never sends
 	if (sndStat != CAN_OK) {
 #ifdef MCP_STDERR
 	//	MCP_STDERR.print("Error Sending Message CAN_ANTRIEB442 Id:0x");
