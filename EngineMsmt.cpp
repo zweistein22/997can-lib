@@ -1,3 +1,10 @@
+#ifndef __AVR_ATmega2560__
+#define NO_PRINTLNDATASERIAL
+#define NO_CAN_242_245_442
+#endif
+
+
+
 #include <BreitBandLambda.h>
 #include "EngineMsmt.h"
 #include <PString.h>
@@ -18,15 +25,14 @@ PGM_P const EngineError_STRING[] PROGMEM = {
 };
 
 
-float EngOilTemp(MOTOR_2 & can245) {
-	return 0.75*can245.Tmot - 48;
+float EngOilTemp(byte & Tmot) {
+	return 0.75*Tmot - 48;
 }
 
 
 void HeadU_Zero() {
 
 	Head.settings.oilpump = 0;
-	Head.settings.rpm = 0;
 	Head.settings.vacuumpump = 0;
 	Head.settings.waterinjection = 0;
 }
@@ -97,18 +103,23 @@ void PrintlnDataSerial(EngineMsmt &engine, MOTOR_1 &can242, MOTOR_2 & can245) {
 		line1.print(")");
 	}
 	else line1.print((float)(engine.lambdaplus100 - 100) / 100.0);
-#ifdef LAMBDA2SERIAL
+
 	line1.print("|");
 	line1.print("llamb:");
-	line1.print(engine.llambdaplus100 - 100);
-#endif
+	if (engine.llambdaplus100 < 100) {
+		line1.print("(");
+		line1.print(pstr_lambdaErrors(engine.llambdaplus100 - 100));
+		line1.print(")");
+	}
+	else line1.print((float)(engine.llambdaplus100 - 100) / 100.0);
+
 	line1.print("|");
 	line1.print("nmot:");
 	line1.print(can242.nmot / 4);
 
 	line1.print("|");
 	line1.print("Tmot:");
-	line1.print(EngOilTemp(can245));
+	line1.print(EngOilTemp(can245.Tmot));
 
 	line1.print("|");
 	line1.print("miist:");
@@ -127,6 +138,7 @@ void PrintlnDataSerial(EngineMsmt &engine, MOTOR_1 &can242, MOTOR_2 & can245) {
     line1.print(can245.B_bremse);
 	line1.print("|");
 
+	
 	//line1.print(",E_bremse=");
 	//line1.print(can245.E_bremse);
 	//line1.print(",B_ffz=");

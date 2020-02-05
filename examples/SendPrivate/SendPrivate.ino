@@ -5,23 +5,37 @@
 
 void setup()
 {
-  delay(2000);
   Serial.begin(115200);
+  while (!Serial);
   EngineMsmtU_Zero();
-  CAN_Begin();
+  
   }
 int iloop = 0;
+byte can_result = CAN_FAIL;
+unsigned long lastmillis = millis();
+long minlooptime = 100;
 void loop()
 {
-	Engine.sensor.egtl = iloop++ % 1050;
+	if (can_result != CAN_OK) {
+		can_result = CAN_BeginMaster();
+		delay(20);
+		//if (MCP2515_FAIL == can_result) resetarduino();
+	}
+	Engine.sensor.egtl =( iloop++ % 1050);
 	Engine.sensor.egtr = Engine.sensor.egtl;
 	Engine.sensor.lambdaplus100 = (byte)((int)random(-9 + 100,-9+179));
-	Serial.print("EGT =");
-	Serial.println(Engine.sensor.egtl);
-	if (sendCan()!=CAN_OK) {
-		//Serial.println("SendCan FAIL");
-		CAN_Begin();
-		delay(1000);
+	
+
+	if(sendBothPrivateCan(Engine)==CAN_OK){
+	
+		Serial.print("EGT =");
+		Serial.println(Engine.sensor.egtl);
 	}
-	delay(10);
+	//else Serial.println("ERROR sendBothPrivateCan(Engine)");
+
+	long to_wait= minlooptime- (millis() - lastmillis);
+	if (to_wait > 0) delay(to_wait);
+	lastmillis = millis();
+	
+	
 }

@@ -4,6 +4,7 @@
 #include <avr/pgmspace.h>
 
 
+
 #define FOREACH_EngineError(EngineError) \
         EngineError(OK)   \
         EngineError(CRC_NOT_VALID)  \
@@ -24,6 +25,7 @@ enum EGT_Status {
 
 };
 
+#ifndef NO_CAN_242_245_442
 typedef struct {
 	unsigned int St_ACD : 3;
 	unsigned int F_Anz_ACD : 1;
@@ -66,17 +68,27 @@ typedef struct {
 	unsigned char misol;
 } MOTOR_2;
 
+
+#endif
+float EngOilTemp(byte& Tmot);
+
 typedef struct  {
- int status:8;			// 0
- int EGT_Status_left:4;		// 1
+ unsigned int egtl : 12;
+ int EGT_Status_left:4;		
+ unsigned int egtr : 12;	
  int EGT_Status_right:4;
- word egtl;					// 2
- word egtr;					// 4
- word iatl;					// 6
- word iatr;					// 8
- byte lambdaplus100;		// 10
- byte llambdaplus100;		// 11
- word iatbeforeIC;			// 12
+ 
+ byte status;			
+ byte nmot100;
+ byte lambdaplus100;		
+ byte llambdaplus100;		
+ 
+ int iatl:12;					// 6
+ int iatr:12;					// 8
+ byte Tmot;
+ 
+ int iatbeforeIC:12;			// 12
+ int dummy1:4;
  unsigned int map:15;		// 14
  unsigned int gearboxoilpump : 1;
  } EngineMsmt ;
@@ -87,10 +99,10 @@ typedef union {
 } EngineMsmtU;
 
 typedef struct {
-  int rpm:13;
   int waterinjection:1;
   int oilpump:1;
   int vacuumpump : 1;
+  int dummy : 5;
   
 } Headunit;
 
@@ -99,11 +111,6 @@ typedef union {
   char b[sizeof(Headunit)];
 } HeadU;
 
-#ifdef __AVR__
-#ifndef __AVR_ATmega2560__
-#define NO_PRINTLNDATASERIAL
-#endif
-#endif
 
 
 #ifndef NO_PRINTLNDATASERIAL
@@ -114,5 +121,5 @@ extern HeadU Head;
 extern PGM_P const EngineError_STRING[] PROGMEM;
 void HeadU_Zero();
 void EngineMsmtU_Zero();
-float EngOilTemp(MOTOR_2 & can245);
+
 #endif
