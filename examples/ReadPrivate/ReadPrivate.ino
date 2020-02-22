@@ -1,6 +1,6 @@
-#define DISPLAY_CAN_SLAVE
-#define  NO_CAN_242_245_442
-#define NO_PRINTLNDATASERIAL
+//#define  NO_CAN_242_245_442
+//#define NO_PRINTLNDATASERIAL
+#define DEBUGSERIAL Serial
 #include <Can997.h>
 #include <EngineMsmt.h>
 
@@ -26,10 +26,14 @@ void loop() {
    }
   //getCan242(50, can242);
   //getCan245(50, can245);
-   if (getCANDataPrivate(200, Engine) == CAN_OK) {
+   if (can_result== CAN_OK && getCANDataPrivate(300, Engine) == CAN_OK) {
        Serial.print("EGT(left)=");
-       Serial.println((int)Engine.sensor.egtl);
+       Serial.print((int)Engine.sensor.egtl);
+       Serial.print(", iatbeforeIC=");
+       Serial.println((int)Engine.sensor.iatbeforeIC);
+
    }
   // else Serial.println("ERROR: getCANDataPrivate(400, Engine) ");
+   delay(100);
   
 }

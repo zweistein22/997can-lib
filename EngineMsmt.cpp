@@ -1,16 +1,6 @@
-#ifndef __AVR_ATmega2560__
-#define NO_PRINTLNDATASERIAL
-#define NO_CAN_242_245_442
-#endif
-
-
-
 #include <BreitBandLambda.h>
 #include "EngineMsmt.h"
 #include <PString.h>
-
-
-
 
 EngineMsmtU Engine;
 HeadU Head;
@@ -96,15 +86,6 @@ void PrintlnDataSerial(EngineMsmt &engine, MOTOR_1 &can242, MOTOR_2 & can245) {
 	}
 	else line1.print(engine.egtr);
 	line1.print("|");
-	line1.print("lambda:");
-	if (engine.lambdaplus100 < 100) {
-		line1.print("(");
-		line1.print(pstr_lambdaErrors(engine.lambdaplus100 - 100));
-		line1.print(")");
-	}
-	else line1.print((float)(engine.lambdaplus100 - 100) / 100.0);
-
-	line1.print("|");
 	line1.print("llamb:");
 	if (engine.llambdaplus100 < 100) {
 		line1.print("(");
@@ -112,6 +93,15 @@ void PrintlnDataSerial(EngineMsmt &engine, MOTOR_1 &can242, MOTOR_2 & can245) {
 		line1.print(")");
 	}
 	else line1.print((float)(engine.llambdaplus100 - 100) / 100.0);
+	line1.print("|");
+	
+	line1.print("lambda:");
+	if (engine.lambdaplus100 < 100) {
+		line1.print("(");
+		line1.print(pstr_lambdaErrors(engine.lambdaplus100 - 100));
+		line1.print(")");
+	}
+	else line1.print((float)(engine.lambdaplus100 - 100) / 100.0);
 
 	line1.print("|");
 	line1.print("nmot:");
