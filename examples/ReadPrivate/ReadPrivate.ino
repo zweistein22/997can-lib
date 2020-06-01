@@ -20,13 +20,13 @@ void loop() {
 
    
    if (can_result != CAN_OK) {
-       can_result = CAN_BeginSlave();
-       delay(500);
+       can_result = CAN0_BeginSlave();
+       delay(50);
        //if (MCP2515_FAIL == can_result) resetarduino();
    }
   //getCan242(50, can242);
   //getCan245(50, can245);
-   if (can_result== CAN_OK && getCANDataPrivate(300, Engine) == CAN_OK) {
+   if (can_result== CAN_OK && CAN0_getbothPrivate(50, Engine) == CAN_OK) {
        Serial.print("EGT(left)=");
        Serial.print((int)Engine.sensor.egtl);
        Serial.print(", iatbeforeIC=");

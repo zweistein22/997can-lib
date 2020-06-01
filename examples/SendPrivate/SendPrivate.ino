@@ -1,23 +1,24 @@
 
 #include <Can997.h>
 
-
+byte can_result = CAN_FAIL;
 void setup()
 {
   Serial.begin(115200);
-  while (!Serial);
+  //while (!Serial);
   EngineMsmtU_Zero();
+  can_result = CAN1_BeginMaster();
   
   }
 int iloop = 0;
-byte can_result = CAN_FAIL;
+
 unsigned long lastmillis = millis();
-long minlooptime = 100;
+long minlooptime = 10;
 void loop()
 {
 	if (can_result != CAN_OK) {
-		can_result = CAN_BeginMaster();
-		delay(20);
+		can_result = CAN1_BeginMaster();
+		delay(200);
 		//if (MCP2515_FAIL == can_result) resetarduino();
 	}
 	Engine.sensor.egtl =(int)( iloop++ % 1050);
@@ -29,7 +30,9 @@ void loop()
 	Engine.sensor.Tmot = 50;
 	
 	Engine.sensor.map = (int)random(950, 1800);
-	if(sendBothPrivateCan(Engine)==CAN_OK){
+
+	can_result = CAN1_sendbothPrivate(Engine);
+	if(can_result == CAN_OK){
 	
 		Serial.print("EGT =");
 		Serial.print(Engine.sensor.egtl);
