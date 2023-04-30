@@ -25,14 +25,8 @@ enum EGT_Status {
 
 };
 
-#ifndef NO_CAN_242_245_442
-typedef struct {
-	unsigned int St_ACD : 3;
-	unsigned int F_Anz_ACD : 1;
-	unsigned int ACD_Text : 3;
-	unsigned int Anz_ACD_ein : 1;
+#ifndef NO_CAN_242_245
 
-}ACD_1;
 
 typedef struct {
 	unsigned int B_ll : 1;
@@ -88,7 +82,8 @@ typedef struct  {
  byte Tmot;
  
  int iatbeforeIC:12;			// 12
- int dummy1:4;
+ int dummy1:3;
+ int wi:1;
  unsigned int map:15;		// 14
  unsigned int gearboxoilpump : 1;
  } EngineMsmt ;

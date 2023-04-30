@@ -8,6 +8,7 @@
 #define CAN1_CS 41
 #define CAN1_RESET A11
 #define MCP_STDERR Serial
+#define NO_CAN_ACD
 #else 
 #if defined __AVR__
 #ifdef __AVR_ATmega328P__
@@ -19,7 +20,7 @@
 #define CAN0_CS 7	
 #define CAN0_INT 2 // Set INT to pin 2
 #define CAN0_RESET A3
-#define NO_CAN_242_245_442
+#define NO_CAN_242_245
 #else
 #define CAN0_CS 7	
 #define CAN0_INT 6 // Set INT to pin 6
@@ -43,14 +44,13 @@ extern MCP_CAN CAN1;
 INT8U CAN1_BeginMaster();
 INT8U CAN1_sendbothPrivate(EngineMsmtU& _Engine);
 #endif
-#ifndef NO_CAN_242_245_442
+#ifndef NO_CAN_242_245
 #define CAN_ANTRIEB242 0x242
 #define CAN_ANTRIEB245 0x245
-#define CAN_ANTRIEB442 0x442
-INT8U CAN0_send442();
 INT8U  CAN0_get242(long duration, MOTOR_1& can242);
 INT8U  CAN0_get245(long duration, MOTOR_2& can245);
 #endif
+
 extern MCP_CAN CAN0;
 
 #define CAN_EXTENDED 0x80000000

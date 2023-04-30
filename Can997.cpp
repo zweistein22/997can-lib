@@ -163,7 +163,7 @@ INT8U  CAN0_getbothPrivate(long duration, EngineMsmtU& Engine) {
 
 
 
-#ifndef NO_CAN_242_245_442
+#ifndef NO_CAN_242_245
 INT8U CAN0_BeginMaster() {
 	pinMode(CAN0_RESET, OUTPUT);
 	digitalWrite(CAN0_RESET, LOW);
@@ -210,8 +210,8 @@ INT8U CAN0_BeginMaster() {
 	CAN0.init_Mask(1, 0, mask); // only address containing 0x40 are allowed, 0x640, 0x440, 0x240, 0x241,0x24F,...
 	CAN0.init_Filt(2, 0, ((long)CAN_ANTRIEB242) << 16);
 	CAN0.init_Filt(3, 0, ((long)CAN_ANTRIEB245) << 16);
-	CAN0.init_Filt(4, 0, ((long)CAN_ANTRIEB442) << 16);
-	CAN0.init_Filt(5, 0, ((long)CAN_ANTRIEB442) << 16);
+	CAN0.init_Filt(4, 0, ((long)CAN_ANTRIEB245) << 16);
+	CAN0.init_Filt(5, 0, ((long)CAN_ANTRIEB245) << 16);
 	// there are 6 filter in mcp2515
 	return  CAN0_SetMode(MCP_LISTENONLY);
 }
@@ -286,10 +286,10 @@ INT8U CAN1_BeginMaster() {
 	CAN1.init_Filt(1, ext, ext ? ((long)CAN_PRIVATE2) : ((long)CAN_PRIVATE2) << 16);
 	
 	CAN1.init_Mask(1, 0, ((long)0x7FF) << 16);
-	CAN1.init_Filt(2, 0, ((long)CAN_ANTRIEB442) << 16);
-	CAN1.init_Filt(3, 0, ((long)CAN_ANTRIEB442) << 16);
-	CAN1.init_Filt(4, 0, ((long)CAN_ANTRIEB442) << 16);
-	CAN1.init_Filt(5, 0, ((long)CAN_ANTRIEB442) << 16);
+	CAN1.init_Filt(2, ext, ext ? ((long)CAN_PRIVATE2) : ((long)CAN_PRIVATE2) << 16);
+	CAN1.init_Filt(3, ext, ext ? ((long)CAN_PRIVATE2) : ((long)CAN_PRIVATE2) << 16);
+	CAN1.init_Filt(4, ext, ext ? ((long)CAN_PRIVATE2) : ((long)CAN_PRIVATE2) << 16);
+	CAN1.init_Filt(5, ext, ext ? ((long)CAN_PRIVATE2) : ((long)CAN_PRIVATE2) << 16);
 	
 	// there are 6 filter in mcp2515
 	return CAN1_SetMode(MCP_NORMAL);
@@ -347,15 +347,8 @@ INT8U CAN1_sendbothPrivate(EngineMsmtU& _Engine) {
 	return sndStat;
 }
 #endif
-#ifndef NO_CAN_242_245_442
-INT8U CAN0_send442() {
-	byte sndStat = CAN_FAIL;
-	sndStat = CAN0_SetMode(MCP_NORMAL);
-	canbuf[0] = 0x02;// ACD_1  2 = Normal_Prog_aktiv
-	sndStat = CAN0.sendMsgBuf(CAN_ANTRIEB442, 1, canbuf);
-	byte sndStat2 = CAN0_SetMode(MCP_LISTENONLY);
-	return sndStat; // never sends
-}
+#ifndef NO_CAN_242_245
+
 INT8U CAN0_get245(long duration, MOTOR_2& can245) {
 	INT8U sndStat = CAN_FAIL;
 	//sndStat = CAN0.setMode(MCP_LISTENONLY);
