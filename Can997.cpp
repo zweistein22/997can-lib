@@ -39,7 +39,7 @@ INT8U CAN0_BeginSlave() {
 	delay(10);
 	digitalWrite(CAN0_RESET, HIGH);
 	pinMode(CAN0_RESET, INPUT_PULLUP);
-	//CAN0.mcp2515_reset(void);
+	//SPI.begin();
 	int retries = 1;
 	INT8U rv = MCP2515_FAIL;
 	for (int r = 0; r < retries; r++) {
@@ -171,7 +171,7 @@ INT8U CAN0_BeginMaster() {
 	delay(10);
 	digitalWrite(CAN0_RESET, HIGH);
 	pinMode(CAN0_RESET, INPUT_PULLUP);
-	//CAN0.mcp2515_reset(void);
+	//SPI.begin();
 	int retries = 1;
 	INT8U rv = MCP2515_FAIL;
 	for (int r = 0; r < retries; r++) {
@@ -248,7 +248,7 @@ INT8U CAN1_BeginMaster() {
 	delay(10);
 	digitalWrite(CAN1_RESET, HIGH);
 	pinMode(CAN1_RESET, INPUT_PULLUP);
-	//CAN1.mcp2515_reset(void);
+	//SPI.begin(); // will also reset spi for CAN0 device!!!!
 	int retries = 1;
 	INT8U rv = MCP2515_FAIL;
 	for (int r = 0; r < retries; r++) {

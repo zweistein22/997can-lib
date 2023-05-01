@@ -1,6 +1,7 @@
 #include <CAN_ACD.h>
 
 
+#define MCP_ERROR Serial
 
 byte can3buf[8];
 
