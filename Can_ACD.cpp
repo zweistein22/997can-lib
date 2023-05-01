@@ -15,7 +15,7 @@ INT8U CAN3_ACD_Begin() {
 	delay(10);
 	digitalWrite(CAN3_RESET, HIGH);
 	pinMode(CAN3_RESET, INPUT_PULLUP);
-
+	//CAN3.mcp2515_reset(void);
 	int retries = 1;
 	INT8U rv = MCP2515_FAIL;
 	for (int r = 0; r < retries; r++) {
