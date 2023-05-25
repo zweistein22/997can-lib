@@ -1,5 +1,6 @@
 .vs/
 Debug/
 __vm/
+obj/
 .filters
 .user
