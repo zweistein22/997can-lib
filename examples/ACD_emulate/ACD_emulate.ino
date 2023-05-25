@@ -1,7 +1,10 @@
+
+
+
+
+#include <EngineMsmt.h>
 #include <CAN_ACD.h>
-
-
-#define MCP_ERROR Serial
+#include <Can997.h>
 
 byte can3buf[8];
 
@@ -11,11 +14,10 @@ byte rv = CAN_FAIL;
 void setup() {
   // put your setup code here, to run once:
   delay(500);
-#ifdef MCP_STDERR
-   MCP_STDERR.begin(115200);
-#endif 
+  MCP_STDERR(begin(115200));
+
    do {
-    rv = CAN3_ACD_Begin();
+    rv = CAN3_ACD_Begin(MCP_LISTENONLY);
    }while(rv==CAN_FAIL);
 }
 

@@ -4,8 +4,7 @@
 
 #include <mcp_can.h>
 
-
-#define MCP_STDERR Serial
+#define MCP_STDERR(call) Serial.call
 
 #define CAN_ANTRIEB_ACD_1 0x442
 #define CAN_ANTRIEB_ACD_EB1_TX 0x7FA
@@ -101,7 +100,7 @@ typedef struct {
 }D_RQ_ALL_A;
 
 
-INT8U CAN3_ACD_Begin();
+INT8U CAN3_ACD_Begin(int mode=MCP_NORMAL);
 extern MCP_CAN CAN3;
 
 
