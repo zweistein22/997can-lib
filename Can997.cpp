@@ -4,10 +4,7 @@
 #include <EngineMsmt.h>
 #include "Can997.h"
 
-unsigned char flagRecv = 0;
-unsigned char len = 0;
-long unsigned int rxId;
-byte canbuf[8];
+ 
 
 
 #ifdef DEBUGSERIAL
@@ -19,15 +16,14 @@ MCP_CAN CAN0(CAN0_CS);                               // Set CS to pin 7
 INT8U CAN0_SetMode(int mode) {
 	byte sndStat = CAN_FAIL;
 	sndStat = CAN0.setMode(mode);
-#ifdef MCP_STDERR
+
 	if (sndStat != CAN_OK) {
-		MCP_STDERR.print("Error CAN0.setMode(");
-		if (mode == MCP_NORMAL) MCP_STDERR.print("MCP_NORMAL ");
-		else if (mode == MCP_LISTENONLY) MCP_STDERR.print("MCP_LISTENONLY ");
-		MCP_STDERR.print(") code=");
-		MCP_STDERR.println(sndStat);
+		MCP_STDERR(print("Error CAN0.setMode("));
+		if (mode == MCP_NORMAL) MCP_STDERR(print("MCP_NORMAL "));
+		else if (mode == MCP_LISTENONLY) MCP_STDERR(print("MCP_LISTENONLY "));
+		MCP_STDERR(print(") code="));
+		MCP_STDERR(println(sndStat));
 	}
-#endif
 	return sndStat;
 }
 
@@ -50,12 +46,8 @@ INT8U CAN0_BeginSlave() {
 		else delay(100);
 	}
 	if (rv == MCP2515_FAIL) {
-#ifdef MCP_STDERR
-		MCP_STDERR.println("MCP2515_FAIL");
-#endif
-#ifdef DEBUGSERIAL
-		DEBUGSERIAL.println("MCP2515_FAIL");
-#endif
+
+	    MCP_STDERR(println("MCP2515_FAIL"));
 		return rv;
 	}
 	pinMode(CAN0_INT, INPUT);								// Configuring pin for /INT input
@@ -70,10 +62,10 @@ INT8U CAN0_BeginSlave() {
 	// we assume CAN_PRIVATE2 same behaviour, so both STD or both EXT
 	rv = CAN0.init_Mask(0, ext, mask);      // there are 2 mask in mcp2515, you need to set both of them
 	if (rv != CAN_OK) {
-#ifdef MCP_STDERR
-		MCP_STDERR.print("CAN0.init_Mask(0, 0, ((long)0xCAN_PRIVATE1&CAN_ALL_STD) error:");
-		MCP_STDERR.println(rv);
-#endif
+
+		MCP_STDERR(print("CAN0.init_Mask(0, 0, ((long)0xCAN_PRIVATE1&CAN_ALL_STD) error:"));
+		MCP_STDERR(println(rv));
+
 		return rv;
 	}
 	CAN0.init_Filt(0, ext ,ext?((long)CAN_PRIVATE1):((long)CAN_PRIVATE1)<<16);
@@ -164,7 +156,7 @@ INT8U  CAN0_getbothPrivate(long duration, EngineMsmtU& Engine) {
 
 
 
-#ifndef NO_CAN_242_245
+#ifndef NO_CAN_242_245_441
 INT8U CAN0_BeginMaster() {
 	pinMode(CAN0_RESET, OUTPUT);
 	digitalWrite(CAN0_RESET, LOW);
@@ -182,9 +174,7 @@ INT8U CAN0_BeginMaster() {
 		
 	}
 	if (rv == MCP2515_FAIL) {
-#ifdef MCP_STDERR
-		MCP_STDERR.println("CAN0 MCP2515_FAIL");
-#endif
+		MCP_STDERR(println("CAN0 MCP2515_FAIL"));
 #ifdef DEBUGSERIAL
 		DEBUGSERIAL.println("CAN0 MCP2515_FAIL");
 #endif
@@ -198,10 +188,10 @@ INT8U CAN0_BeginMaster() {
 
 	rv = CAN0.init_Mask(0, 0, mask);      // there are 2 mask in mcp2515, you need to set both of them
 	if (rv != CAN_OK) {
-#ifdef MCP_STDERR
-		MCP_STDERR.print("CAN0.init_Mask(0, 0, ((long)0x7ff) error:");
-		MCP_STDERR.println(rv);
-#endif
+
+		MCP_STDERR(print("CAN0.init_Mask(0, 0, ((long)0x7ff) error:"));
+		MCP_STDERR(println(rv));
+
 		
 		return rv;
 	}
@@ -211,7 +201,7 @@ INT8U CAN0_BeginMaster() {
 	CAN0.init_Mask(1, 0, mask); // only address containing 0x40 are allowed, 0x640, 0x440, 0x240, 0x241,0x24F,...
 	CAN0.init_Filt(2, 0, ((long)CAN_ANTRIEB242) << 16);
 	CAN0.init_Filt(3, 0, ((long)CAN_ANTRIEB245) << 16);
-	CAN0.init_Filt(4, 0, ((long)CAN_ANTRIEB245) << 16);
+	CAN0.init_Filt(4, 0, ((long)CAN_ANTRIEB441) << 16);
 	CAN0.init_Filt(5, 0, ((long)CAN_ANTRIEB245) << 16);
 	// there are 6 filter in mcp2515
 	return  CAN0_SetMode(MCP_LISTENONLY);
@@ -223,15 +213,15 @@ MCP_CAN CAN1(CAN1_CS);
 INT8U CAN1_SetMode(int mode) {
 	byte sndStat = CAN_FAIL;
 	sndStat = CAN1.setMode(mode);
-#ifdef MCP_STDERR
+
 	if (sndStat != CAN_OK) {
-		MCP_STDERR.print("Error CAN1.setMode(");
-		if (mode == MCP_NORMAL) MCP_STDERR.print("MCP_NORMAL ");
-		else if (mode == MCP_LISTENONLY) MCP_STDERR.print("MCP_LISTENONLY ");
-		MCP_STDERR.print(") code=");
-		MCP_STDERR.println(sndStat);
+		MCP_STDERR(print("Error CAN1.setMode("));
+		if (mode == MCP_NORMAL) MCP_STDERR(print("MCP_NORMAL "));
+		else if (mode == MCP_LISTENONLY) MCP_STDERR(print("MCP_LISTENONLY "));
+		MCP_STDERR(print(") code="));
+		MCP_STDERR(println(sndStat));
 	}
-#endif
+
 	return sndStat;
 }
 INT8U CAN1_BeginMaster() {
@@ -259,9 +249,9 @@ INT8U CAN1_BeginMaster() {
 		else delay(100);
 	}
 	if (rv == MCP2515_FAIL) {
-#ifdef MCP_STDERR
-		MCP_STDERR.println("MCP2515_FAIL");
-#endif
+
+		MCP_STDERR(println("MCP2515_FAIL"));
+
 #ifdef DEBUGSERIAL
 		DEBUGSERIAL.println("MCP2515_FAIL");
 #endif
@@ -278,10 +268,10 @@ INT8U CAN1_BeginMaster() {
 	}
 	rv = CAN1.init_Mask(0, ext, mask);      // there are 2 mask in mcp2515, you need to set both of them
 	if (rv != CAN_OK) {
-#ifdef MCP_STDERR
-		MCP_STDERR.print("CAN1.init_Mask(0, 1, ((long)0x7ff) error:");
-		MCP_STDERR.println(rv);
-#endif
+
+		MCP_STDERR(print("CAN1.init_Mask(0, 1, ((long)0x7ff) error:"));
+		MCP_STDERR(println(rv));
+
 		return rv;
 	}
 	CAN1.init_Filt(0, ext, ext ? ((long)CAN_PRIVATE1) : ((long)CAN_PRIVATE1) << 16);
@@ -349,7 +339,47 @@ INT8U CAN1_sendbothPrivate(EngineMsmtU& _Engine) {
 	return sndStat;
 }
 #endif
-#ifndef NO_CAN_242_245
+#ifndef NO_CAN_242_245_441
+
+INT8U CAN0_get441(long duration, MOTOR_4& can441) {
+	INT8U sndStat = CAN_FAIL;
+	//sndStat = CAN0.setMode(MCP_LISTENONLY);
+	//if (sndStat != CAN_OK) return sndStat;
+	long start = millis();
+	bool receivedintime = false;
+	do {
+		if (!digitalRead(CAN0_INT))                         // If CAN0_INT pin is low, read receive buffer
+		{
+			sndStat = CAN0.readMsgBuf(&rxId, &len, canbuf);
+			if (sndStat != CAN_OK) continue;
+			if (rxId == 0x245) {
+#ifdef DEBUGSERIAL
+				DEBUGSERIAL.print("Antrieb(0x441):");
+				if (sizeof(MOTOR_4) != 8)DEBUGSERIAL.println("FATAL: MOTOR_4 NOT sizeof(8)");
+#endif
+				if (len < 8) continue;
+				memcpy(&can441, canbuf, 8);
+
+#ifdef DEBUGSERIAL
+				DEBUGSERIAL.print("Toel=");
+				DEBUGSERIAL.print(EngOilTemp(can441.Toel));
+				DEBUGSERIAL.print(",Oeldruck=");
+				DEBUGSERIAL.print(can441.Oeldruck*0.04);
+				DEBUGSERIAL.print(" bar");
+				DEBUGSERIAL.println("");
+#endif
+				receivedintime = true;
+				break;
+			}
+		}
+	} while (millis() - start < duration);
+	//sndStat = CAN0.setMode(MCP_NORMAL);
+	
+	if (!receivedintime) {
+		MCP_STDERR(println("Timout reading CAN_ANTRIEB441"));
+	}
+	return sndStat;
+}
 
 INT8U CAN0_get245(long duration, MOTOR_2& can245) {
 	INT8U sndStat = CAN_FAIL;
@@ -365,7 +395,7 @@ INT8U CAN0_get245(long duration, MOTOR_2& can245) {
 			if (rxId == 0x245) {
 #ifdef DEBUGSERIAL
 				DEBUGSERIAL.print("Antrieb(0x245):");
-				if (sizeof(MOTOR_2) != 8)DEBUGSERIAL.println("FATAL: MOTOR_1 NOT sizeof(8)");
+				if (sizeof(MOTOR_2) != 8)DEBUGSERIAL.println("FATAL: MOTOR_2 NOT sizeof(8)");
 #endif
 				if (len < 8) continue;
 				memcpy(&can245, canbuf, 8);
@@ -403,9 +433,7 @@ INT8U CAN0_get245(long duration, MOTOR_2& can245) {
 	//sndStat = CAN0.setMode(MCP_NORMAL);
 	
 	if (!receivedintime) {
-#ifdef	MCP_STDERR
-		MCP_STDERR.println("Timout reading CAN_ANTRIEB245");
-#endif
+		MCP_STDERR(println("Timout reading CAN_ANTRIEB245"));
 	}
 	return sndStat;
 }
@@ -456,9 +484,7 @@ INT8U CAN0_get242(long duration, MOTOR_1& can242) {
 		can242.miist = 0;
 	}
 	if (!receivedintime) {
-#ifdef	MCP_STDERR
-		MCP_STDERR.println("Timout reading CAN_ANTRIEB242");
-#endif
+		MCP_STDERR(println("Timout reading CAN_ANTRIEB242"));
 	}
 	return sndStat;
 }

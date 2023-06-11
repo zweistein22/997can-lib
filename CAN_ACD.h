@@ -4,18 +4,19 @@
 
 #include <mcp_can.h>
 
-
-#define MCP_STDERR Serial
+#define MCP_STDERR(call) Serial.call
 
 #define CAN_ANTRIEB_ACD_1 0x442
 #define CAN_ANTRIEB_ACD_EB1_TX 0x7FA
 #define CAN_ANTRIEB_ACD_V 0x71B
 #define CAN_ANTRIEB_D_RS_ACD  0x6F4
+#define CAN_ANTRIEB_D_RQ_ACD 0x5F4
+#define CAN_ANTRIEB_D_RQ_ALL_A 0x5D6
+
 #define CAN_ANTRIEB_BREMSE_1 0x14A
 #define CAN_ANTRIEB_LWS_1 0xC2
 #define CAN_ANTRIEB_KOMBI_7_A 0x62A
-#define CAN_ANTRIEB_D_RQ_ACD 0x5F4
-#define CAN_ANTRIEB_D_RQ_ALL_A 0x5D6
+
 #define CAN3_CS 7	
 #define CAN3_INT 2 // Set INT to pin 6
 #define CAN3_RESET A3
@@ -101,9 +102,12 @@ typedef struct {
 }D_RQ_ALL_A;
 
 
-INT8U CAN3_ACD_Begin();
+INT8U CAN3_ACD_Begin(int mode=MCP_NORMAL);
 extern MCP_CAN CAN3;
-
-
+INT8U setMode(MCP_CAN& can, int mode);
+INT8U CAN3_get442(long duration, ACD_1& can442);
+INT8U CAN3_get71b(long duration, ACD_V& can71b);
+INT8U CAN3_get5d6(long duration, D_RQ_ALL_A& can5d6);
+INT8U CAN3_get5f4(long duration, D_RQ_ACD& can5f4);
 #endif
 

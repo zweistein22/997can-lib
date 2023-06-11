@@ -46,7 +46,11 @@ void EngineMsmtU_Zero() {
 char _buffer1[196];
 PString line1(_buffer1, sizeof(_buffer1));
 
-void PrintlnDataSerial(EngineMsmt &engine, MOTOR_1 &can242, MOTOR_2 & can245) {
+//#define PRN_MOTOR1
+//#define PRN_MOTOR2
+#define PRN_MOTOR4
+
+void PrintlnDataSerial(EngineMsmt &engine, MOTOR_1 &can242, MOTOR_2 & can245, MOTOR_4 & can441) {
 	line1.begin();
 	if (engine.status != OK) {
 		char buf[20];
@@ -102,7 +106,7 @@ void PrintlnDataSerial(EngineMsmt &engine, MOTOR_1 &can242, MOTOR_2 & can245) {
 		line1.print(")");
 	}
 	else line1.print((float)(engine.lambdaplus100 - 100) / 100.0);
-
+#ifdef PRN_MOTOR1
 	line1.print("|");
 	line1.print("nmot:");
 	line1.print(can242.nmot / 4);
@@ -119,7 +123,8 @@ void PrintlnDataSerial(EngineMsmt &engine, MOTOR_1 &can242, MOTOR_2 & can245) {
 	line1.print("Wped_fgr:");
 	line1.print(can242.Wped_fgr*100.0 / 254.0);
 	line1.print("|");
-
+#endif
+#ifdef PRN_MOTOR_2
 	line1.print("E_tm:");
 	line1.print(can245.E_tm);
 	line1.print("|");
@@ -151,7 +156,19 @@ void PrintlnDataSerial(EngineMsmt &engine, MOTOR_1 &can242, MOTOR_2 & can245) {
 	line1.print("|");
 	line1.print("misol:");
 	line1.print(can245.misol);
-	
+#endif
+
+#ifdef PRN_MOTOR4
+	line1.print("|");
+	line1.print("Toel:");
+	line1.print(EngOilTemp(can441.Toel));
+	line1.print("|");
+	line1.print("Oeldruck:");
+	line1.print(can441.Oeldruck*0.04);
+#endif
+
+
+
 
 	Serial.println(line1);
 

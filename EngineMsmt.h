@@ -25,7 +25,7 @@ enum EGT_Status {
 
 };
 
-#ifndef NO_CAN_242_245
+#ifndef NO_CAN_242_245_441
 
 
 typedef struct {
@@ -62,6 +62,23 @@ typedef struct {
 	unsigned char misol;
 } MOTOR_2;
 
+typedef struct {
+	unsigned int L_checkE :2;
+	unsigned int B_tankd :1;
+	unsigned int B_redmd:1;
+	unsigned int E_mspg : 1;
+	unsigned int E_Toel : 1;
+	unsigned int S_Oeldr : 1;
+	unsigned int KL_Gen : 1;
+	unsigned int KuehlerL_Stg : 7;
+	unsigned int Motorlauf : 1;
+	unsigned int kva:16;
+	unsigned char P_Lade;
+	unsigned char Toel;
+	unsigned char Oeldruck;
+	unsigned int S_KuehlWS:1;
+	unsigned int dummy:7;
+} MOTOR_4;
 
 #endif
 float EngOilTemp(byte& Tmot);
@@ -82,7 +99,8 @@ typedef struct  {
  byte Tmot;
  
  int iatbeforeIC:12;			// 12
- int dummy1:3;
+ int oilpressuredrop:1;
+ int dummy1:2;
  int wi:1;
  unsigned int map:15;		// 14
  unsigned int gearboxoilpump : 1;
@@ -109,7 +127,7 @@ typedef union {
 
 
 #ifndef NO_PRINTLNDATASERIAL
-void PrintlnDataSerial(EngineMsmt &engine, MOTOR_1 &can242,MOTOR_2 & can245);
+void PrintlnDataSerial(EngineMsmt &engine, MOTOR_1 &can242,MOTOR_2 & can245,MOTOR_4 & can441);
 #endif
 extern EngineMsmtU Engine;
 extern HeadU Head;
