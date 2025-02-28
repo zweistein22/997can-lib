@@ -3,7 +3,8 @@
 
 MCP_CAN CAN3(CAN3_CS);
 
-#define DEBUGSERIAL Serial
+#define DEBUGSERIAL(call) Serial.call
+//#define DEBUGSERIAL(call)
 
 unsigned char flagRecv;
 unsigned char len;
@@ -93,19 +94,14 @@ INT8U CAN3_get5d6(long duration, D_RQ_ALL_A& can5d6) {
 			sndStat = CAN3.readMsgBuf(&rxId, &len, canbuf);
 			if (sndStat != CAN_OK) continue;
 			if (rxId == 0x5d6) {
-#ifdef DEBUGSERIAL
-				DEBUGSERIAL.print("Antrieb(0x5d6):");
-				if (sizeof(ACD_1) != 1)DEBUGSERIAL.println("FATAL: D_RQ_ALL_A sizeof(1)");
-#endif
+				DEBUGSERIAL(print("Antrieb(0x5d6):"));
+				if (sizeof(ACD_1) != 1)DEBUGSERIAL(println("FATAL: D_RQ_ALL_A sizeof(1)"));
 				if (len < 1) continue;
 				memcpy(&can5d6, canbuf, 1);
-
-#ifdef DEBUGSERIAL
-				DEBUGSERIAL.print(can5d6.TP_TA,HEX);
-				DEBUGSERIAL.print(" ");
-				DBUGSERIAL.print(can5d6.TP_PCI,HEX);
-				DEBUGSERIAL.println("");
-#endif
+				DEBUGSERIAL(print(can5d6.TP_TA,HEX));
+				DEBUGSERIAL(print(" "));
+				DEBUGSERIAL(print(can5d6.TP_PCI,HEX));
+				DEBUGSERIAL(println(""));
 				receivedintime = true;
 				break;
 			}
@@ -121,8 +117,8 @@ INT8U CAN3_get5d6(long duration, D_RQ_ALL_A& can5d6) {
 
 
 
-INT8U CAN3_get5f4(long duration, D_RQ_ACD& can5f4) {
-	INT8U sndStat = CAN_FAIL;
+INT8U CAN3_get5f4_5d6(long duration, D_RQ_ACD& can5f4,D_RQ_ALL_A& can5d6) {
+	INT8U sndStat = CAN_NOMSG;
 	long start = millis();
 	bool receivedintime = false;
 	do {
@@ -131,29 +127,41 @@ INT8U CAN3_get5f4(long duration, D_RQ_ACD& can5f4) {
 			sndStat = CAN3.readMsgBuf(&rxId, &len, canbuf);
 			if (sndStat != CAN_OK) continue;
 			if (rxId == 0x5f4) {
-#ifdef DEBUGSERIAL
-				DEBUGSERIAL.print("Antrieb(0x5f4):");
-				if (sizeof(ACD_1) != 1)DEBUGSERIAL.println("FATAL: D_RQ_ACD NOT sizeof(1)");
-#endif
+
+				DEBUGSERIAL(print("Antrieb(0x5f4):"));
+				if (sizeof(ACD_1) != 1)DEBUGSERIAL(println("FATAL: D_RQ_ACD NOT sizeof(1)"));
 				if (len < 1) continue;
 				memcpy(&can5f4, canbuf, 1);
 
-#ifdef DEBUGSERIAL
 				for(int k=0;k<8;k++) {
-					DEBUGSERIAL.print(can5f4.data[k],HEX);
-					DEBUGSERIAL.print(" ");
+					DEBUGSERIAL(print(can5f4.data[k],HEX));
+					DEBUGSERIAL(print(" "));
 				}
-				DEBUGSERIAL.println("");
-#endif
+				DEBUGSERIAL(println(""));
+
 				receivedintime = true;
 				break;
 			}
+			if (rxId == 0x5d6) {
+				DEBUGSERIAL(print("Antrieb(0x5d6):"));
+				if (sizeof(ACD_1) != 1)DEBUGSERIAL(println("FATAL: D_RQ_ALL_A sizeof(1)"));
+				if (len < 1) continue;
+				memcpy(&can5d6, canbuf, 1);
+				DEBUGSERIAL(print(can5d6.TP_TA,HEX));
+				DEBUGSERIAL(print(" "));
+				DEBUGSERIAL(print(can5d6.TP_PCI,HEX));
+				DEBUGSERIAL(println(""));
+				receivedintime = true;
+				break;
+			}
+
+
 		}
 	} while (millis() - start < duration);
 	//sndStat = CAN0.setMode(MCP_NORMAL);
 
 	if (!receivedintime) {
-		MCP_STDERR(println("Timout reading CAN_ANTRIEB_D_RQ_ACD"));
+		DEBUGSERIAL(println("Timout reading CAN_ANTRIEB_D_RQ_ACD"));
 	}
 	return sndStat;
 }
@@ -170,24 +178,21 @@ INT8U CAN3_get442(long duration, ACD_1& can442) {
 			sndStat = CAN3.readMsgBuf(&rxId, &len, canbuf);
 			if (sndStat != CAN_OK) continue;
 			if (rxId == 0x442) {
-#ifdef DEBUGSERIAL
-				DEBUGSERIAL.print("Antrieb(0x442):");
-				if (sizeof(ACD_1) != 1)DEBUGSERIAL.println("FATAL: ACD_1 NOT sizeof(1)");
-#endif
-				if (len < 1) continue;
-				memcpy(&can442, canbuf, 1);
 
-#ifdef DEBUGSERIAL
-				DEBUGSERIAL.print("St_ACD=");
-				DEBUGSERIAL.print(can442.St_ACD);
-				DEBUGSERIAL.print(",F_Anz_ACD=");
-				DEBUGSERIAL.print(can442.F_Anz_ACD);
-				DEBUGSERIAL.print(",ACD_Text=");
-				DEBUGSERIAL.print(can442.ACD_Text);
-				DEBUGSERIAL.print(",Anz_ACD_ein=");
-				DEBUGSERIAL.print(can442.Anz_ACD_ein);
-				DEBUGSERIAL.println("");
-#endif
+				DEBUGSERIAL(print("Antrieb(0x442):"));
+				if (sizeof(ACD_1) != 4)DEBUGSERIAL(println("FATAL: ACD_1 NOT sizeof(4)"));
+				if (len < 4) continue;
+				memcpy(&can442, canbuf, 4);
+				DEBUGSERIAL(print("St_ACD="));
+				DEBUGSERIAL(print(can442.St_ACD));
+				DEBUGSERIAL(print(",F_Anz_ACD="));
+				DEBUGSERIAL(print(can442.F_Anz_ACD));
+				DEBUGSERIAL(print(",ACD_Text="));
+				DEBUGSERIAL(print(can442.ACD_Text));
+				DEBUGSERIAL(print(",Anz_ACD_ein="));
+				DEBUGSERIAL(print(can442.Anz_ACD_ein));
+				DEBUGSERIAL(println(""));
+
 				receivedintime = true;
 				break;
 			}
@@ -212,50 +217,42 @@ INT8U CAN3_get71b(long duration, ACD_V& can71b) {
 			sndStat = CAN3.readMsgBuf(&rxId, &len, canbuf);
 			if (sndStat != CAN_OK) continue;
 			if (rxId == 0x71b) {
-#ifdef DEBUGSERIAL
-				DEBUGSERIAL.print("Antrieb(0x442):");
-				if (sizeof(ACD_V) != 8)DEBUGSERIAL.println("FATAL: ACD_V NOT sizeof(8)");
-#endif
+				DEBUGSERIAL(print("Antrieb(0x442):"));
+				if (sizeof(ACD_V) != 8)DEBUGSERIAL(println("FATAL: ACD_V NOT sizeof(8)"));
+
 				if (len < 8) continue;
 				memcpy(&can71b, canbuf, 8);
 
-#ifdef DEBUGSERIAL
-				DEBUGSERIAL.print("AC_SW_Vers=");
-				DEBUGSERIAL.print(can71b.AC_SW_Vers);
-				DEBUGSERIAL.print(" (");
-				DEBUGSERIAL.print(can71b.AC_SW_Jahr);
-				DEBUGSERIAL.print(".");
-				DEBUGSERIAL.print(can71b.AC_SW_Monat);
-				DEBUGSERIAL.print(".");
-				DEBUGSERIAL.print(can71b.AC_SW_Tag);
-				DEBUGSERIAL.print(")");
+				DEBUGSERIAL(print("AC_SW_Vers="));
+				DEBUGSERIAL(print(can71b.AC_SW_Vers));
+				DEBUGSERIAL(print(" ("));
+				DEBUGSERIAL(print(can71b.AC_SW_Jahr));
+				DEBUGSERIAL(print("."));
+				DEBUGSERIAL(print(can71b.AC_SW_Monat));
+				DEBUGSERIAL(print("."));
+				DEBUGSERIAL(print(can71b.AC_SW_Tag));
+				DEBUGSERIAL(print(")"));
 
-				DEBUGSERIAL.print(",AC_CAN_STAND=");
-				DEBUGSERIAL.print(can71b.AC_CAN_STAND);
-
-
-				DEBUGSERIAL.print(",AC_F_BusOff=");
-				DEBUGSERIAL.print(can71b.AC_F_BusOff);
-				DEBUGSERIAL.print(",AC_F_BusOff_Anz=");
-				DEBUGSERIAL.print(can71b.AC_F_BusOff_Anz);
-
-				DEBUGSERIAL.print(",AC_F_CAN_Sig=");
-				DEBUGSERIAL.print(can71b.AC_F_CAN_Sig);
-				DEBUGSERIAL.print(",AC_F_CAN_Time=");
-				DEBUGSERIAL.print(can71b.AC_F_CAN_Time);
-				DEBUGSERIAL.print(",AC_KD_F=");
-				DEBUGSERIAL.print(can71b.AC_KD_F);
-				DEBUGSERIAL.print(",AC_REC=");
-				DEBUGSERIAL.print(can71b.AC_REC);
-				
-				DEBUGSERIAL.print(",AC_TEC=");
-				DEBUGSERIAL.print(can71b.AC_TEC);
+				DEBUGSERIAL(print(",AC_CAN_STAND="));
+				DEBUGSERIAL(print(can71b.AC_CAN_STAND));
 
 
+				DEBUGSERIAL(print(",AC_F_BusOff="));
+				DEBUGSERIAL(print(can71b.AC_F_BusOff));
+				DEBUGSERIAL(print(",AC_F_BusOff_Anz="));
+				DEBUGSERIAL(print(can71b.AC_F_BusOff_Anz));
 
-
-				DEBUGSERIAL.println("");
-#endif
+				DEBUGSERIAL(print(",AC_F_CAN_Sig="));
+				DEBUGSERIAL(print(can71b.AC_F_CAN_Sig));
+				DEBUGSERIAL(print(",AC_F_CAN_Time="));
+				DEBUGSERIAL(print(can71b.AC_F_CAN_Time));
+				DEBUGSERIAL(print(",AC_KD_F="));
+				DEBUGSERIAL(print(can71b.AC_KD_F));
+				DEBUGSERIAL(print(",AC_REC="));
+				DEBUGSERIAL(print(can71b.AC_REC));
+				DEBUGSERIAL(print(",AC_TEC="));
+				DEBUGSERIAL(print(can71b.AC_TEC));
+				DEBUGSERIAL(println(""));
 				receivedintime = true;
 				break;
 			}

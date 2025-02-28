@@ -2,8 +2,14 @@
 #include "EngineMsmt.h"
 #include <PString.h>
 
+//#define PRN_MOTOR1
+//#define PRN_MOTOR2
+#define PRN_MOTOR4
+
+
 EngineMsmtU Engine;
 HeadU Head;
+
 
 #define GENERATE_PROGMEMSTRING(STRING) const char str_##STRING[] PROGMEM ={#STRING};
 #define GENERATE_STRINGNAME(STRING)  str_##STRING,
@@ -48,7 +54,7 @@ PString line1(_buffer1, sizeof(_buffer1));
 
 //#define PRN_MOTOR1
 //#define PRN_MOTOR2
-#define PRN_MOTOR4
+//#define PRN_MOTOR4
 
 void PrintlnDataSerial(EngineMsmt &engine, MOTOR_1 &can242, MOTOR_2 & can245, MOTOR_4 & can441) {
 	line1.begin();
@@ -107,6 +113,7 @@ void PrintlnDataSerial(EngineMsmt &engine, MOTOR_1 &can242, MOTOR_2 & can245, MO
 	}
 	else line1.print((float)(engine.lambdaplus100 - 100) / 100.0);
 #ifdef PRN_MOTOR1
+	
 	line1.print("|");
 	line1.print("nmot:");
 	line1.print(can242.nmot / 4);

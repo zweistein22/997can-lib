@@ -1,8 +1,10 @@
 #ifndef __CAN997_H
 #define __CAN997_H
 
-#define MCP_STDERR(call) Serial.call
-
+#ifndef MCP_STDERR(call)
+#define MCP_STDERR(call) 
+//#define MCP_STDERR(call) Serial.call
+#endif
 #if defined __AVR_ATmega2560__
 #define CAN0_INT 21                             // Set INT to pin 21
 #define CAN0_CS 5	
@@ -16,7 +18,9 @@
 #if defined __AVR__
 #ifdef __AVR_ATmega328P__
 #include <DisplayStderr.h>
+#ifndef MCP_STDERR(call)
 #define MCP_STDERR(call) STDERR.call
+#endif
 #endif
 #define CAN0_CS 7	
 #define CAN0_INT 2 // Set INT to pin 2
@@ -48,9 +52,11 @@ INT8U CAN1_sendbothPrivate(EngineMsmtU& _Engine);
 #define CAN_ANTRIEB242 0x242
 #define CAN_ANTRIEB245 0x245
 #define CAN_ANTRIEB441 0x441
+#define CAN_ANTRIEB308 0x308
 INT8U  CAN0_get242(long duration, MOTOR_1& can242);
 INT8U  CAN0_get245(long duration, MOTOR_2& can245);
 INT8U  CAN0_get441(long duration, MOTOR_4& can441);
+INT8U  CAN0_get308(long duration, GW_A_1& can308);
 #endif
 
 extern MCP_CAN CAN0;

@@ -25,7 +25,29 @@ enum EGT_Status {
 
 };
 
+
+
 #ifndef NO_CAN_242_245_441
+
+typedef struct {
+    unsigned int St_Luefter_Li_A : 2;
+	unsigned int St_Luefter_Re_A : 2;
+	unsigned int S_DH_offen_A : 1;
+	unsigned int Sportmodus_BSG_A : 1;
+	unsigned int Sportmodus_LSS_A : 1;
+	unsigned int Funkschl_Nr_A : 4;
+	unsigned int dummy0 : 2 ;
+	unsigned int Einst_ACD_A : 2;
+	unsigned int Einst_ACD_sp_A : 1;
+	unsigned char Helligkeit_A;
+	unsigned char dummy1[4];
+	unsigned int F_Bug_2_A_1 : 1 ;
+	unsigned int F_Heck_1_A_1 : 1;
+	unsigned int F_BSG_1_A : 1;
+	unsigned int dummy2 : 5;
+	
+
+} GW_A_1;
 
 
 typedef struct {

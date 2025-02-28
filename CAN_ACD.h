@@ -27,8 +27,9 @@ typedef struct {
 	unsigned int F_Anz_ACD : 1;
 	unsigned int ACD_Text : 3;
 	unsigned int Anz_ACD_ein : 1;
-
+	unsigned char dummy[3];
 }ACD_1;
+// msg comes as  4 bytes over can bus
 
 typedef struct {
 	unsigned char AC_SW_Vers;
@@ -104,10 +105,10 @@ typedef struct {
 
 INT8U CAN3_ACD_Begin(int mode=MCP_NORMAL);
 extern MCP_CAN CAN3;
+extern long unsigned int rxId;
 INT8U setMode(MCP_CAN& can, int mode);
 INT8U CAN3_get442(long duration, ACD_1& can442);
 INT8U CAN3_get71b(long duration, ACD_V& can71b);
-INT8U CAN3_get5d6(long duration, D_RQ_ALL_A& can5d6);
-INT8U CAN3_get5f4(long duration, D_RQ_ACD& can5f4);
+INT8U CAN3_get5f4_5d6(long duration, D_RQ_ACD& can5f4,D_RQ_ALL_A& can5d6);
 #endif
 

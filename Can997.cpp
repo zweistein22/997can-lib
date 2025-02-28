@@ -202,7 +202,7 @@ INT8U CAN0_BeginMaster() {
 	CAN0.init_Filt(2, 0, ((long)CAN_ANTRIEB242) << 16);
 	CAN0.init_Filt(3, 0, ((long)CAN_ANTRIEB245) << 16);
 	CAN0.init_Filt(4, 0, ((long)CAN_ANTRIEB441) << 16);
-	CAN0.init_Filt(5, 0, ((long)CAN_ANTRIEB245) << 16);
+	CAN0.init_Filt(5, 0, ((long)CAN_ANTRIEB308) << 16);
 	// there are 6 filter in mcp2515
 	return  CAN0_SetMode(MCP_LISTENONLY);
 }
@@ -225,7 +225,7 @@ INT8U CAN1_SetMode(int mode) {
 	return sndStat;
 }
 INT8U CAN1_BeginMaster() {
-	Serial.print("CAN1_CS=");
+	/*Serial.print("CAN1_CS=");
 	Serial.print(CAN1_CS);
 
 	Serial.print(" CAN1_RESET=");
@@ -233,6 +233,7 @@ INT8U CAN1_BeginMaster() {
 	Serial.print(" CAN1_INT=");
 	Serial.print(CAN1_INT);
 	Serial.println(" CAN1_BeginMaster");
+	*/
 	pinMode(CAN1_RESET, OUTPUT);
 	digitalWrite(CAN1_RESET, LOW);
 	delay(10);
@@ -341,6 +342,44 @@ INT8U CAN1_sendbothPrivate(EngineMsmtU& _Engine) {
 #endif
 #ifndef NO_CAN_242_245_441
 
+INT8U CAN0_get308(long duration, GW_A_1& can308) {
+	INT8U sndStat = CAN_FAIL;
+	//sndStat = CAN0.setMode(MCP_LISTENONLY);
+	//if (sndStat != CAN_OK) return sndStat;
+	long start = millis();
+	bool receivedintime = false;
+	do {
+		if (!digitalRead(CAN0_INT))                         // If CAN0_INT pin is low, read receive buffer
+		{
+			sndStat = CAN0.readMsgBuf(&rxId, &len, canbuf);
+			if (sndStat != CAN_OK) continue;
+			if (rxId == 0x308) {
+#ifdef DEBUGSERIAL
+				DEBUGSERIAL.print("Antrieb(0x308):");
+				if (sizeof(GW_A_1) != 8)DEBUGSERIAL.println("FATAL: GW_A_1 NOT sizeof(8)");
+#endif
+				if (len < 8) continue;
+				memcpy(&can308, canbuf, 8);
+
+#ifdef DEBUGSERIAL
+				DEBUGSERIAL.print("SportModus_BSG_A=");
+				DEBUGSERIAL.print(EngOilTemp(can308.Sportmodus_BSG_A));
+				DEBUGSERIAL.println("");
+#endif
+				receivedintime = true;
+				break;
+			}
+		}
+	} while (millis() - start < duration);
+	//sndStat = CAN0.setMode(MCP_NORMAL);
+	
+	if (!receivedintime) {
+		MCP_STDERR(println("Timout reading CAN_ANTRIEB308"));
+	}
+	return sndStat;
+}
+
+
 INT8U CAN0_get441(long duration, MOTOR_4& can441) {
 	INT8U sndStat = CAN_FAIL;
 	//sndStat = CAN0.setMode(MCP_LISTENONLY);
@@ -352,7 +391,7 @@ INT8U CAN0_get441(long duration, MOTOR_4& can441) {
 		{
 			sndStat = CAN0.readMsgBuf(&rxId, &len, canbuf);
 			if (sndStat != CAN_OK) continue;
-			if (rxId == 0x245) {
+			if (rxId == 0x441) {
 #ifdef DEBUGSERIAL
 				DEBUGSERIAL.print("Antrieb(0x441):");
 				if (sizeof(MOTOR_4) != 8)DEBUGSERIAL.println("FATAL: MOTOR_4 NOT sizeof(8)");
