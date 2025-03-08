@@ -4,8 +4,10 @@
 
 //#define PRN_MOTOR1
 //#define PRN_MOTOR2
-#define PRN_MOTOR4
-
+//#define PRN_MOTOR4
+//#define PRN_IAT_AIR
+//#define PRN_EGT
+#define PRN_LAMBDA
 
 EngineMsmtU Engine;
 HeadU Head;
@@ -69,6 +71,8 @@ void PrintlnDataSerial(EngineMsmt &engine, MOTOR_1 &can242, MOTOR_2 & can245, MO
 	line1.print("map:");
 	line1.print(engine.map);
 	line1.print("|");
+#ifdef PRN_IAT_AIR
+
 	line1.print("air:");
 	line1.print(engine.iatbeforeIC);
 	line1.print("|");
@@ -78,43 +82,93 @@ void PrintlnDataSerial(EngineMsmt &engine, MOTOR_1 &can242, MOTOR_2 & can245, MO
 	line1.print("iatr:");
 	line1.print(engine.iatr);
 	line1.print("|");
+#endif
+
+#ifdef PRN_EGT
 	line1.print("egtl:");
 	if (engine.EGT_Status_left != MAX31855OK) {
+#else 
+	if (engine.EGT_Status_left != MAX31855OK) {
+		line1.print("egtl:");
+#endif
 		if (engine.EGT_Status_left == OC) line1.print("OC");
 		if (engine.EGT_Status_left == SCV) line1.print("SCV");
 		if (engine.EGT_Status_left == SCG) line1.print("SCG");
+		line1.print("|");
 
 	}
-	else   line1.print(engine.egtl);
-	line1.print("|");
-
+	else {
+#ifdef PRN_EGT
+		line1.print(engine.egtl);
+		line1.print("|");
+#endif
+	}
+	
+#ifdef PRN_EGT
 	line1.print("egtr:");
 	if (engine.EGT_Status_right != MAX31855OK) {
+#else
+	if (engine.EGT_Status_right != MAX31855OK) {
+		line1.print("egtr:");
+#endif
 		if (engine.EGT_Status_right == OC) line1.print("OC");
 		if (engine.EGT_Status_right == SCV) line1.print("SCV");
 		if (engine.EGT_Status_right == SCG) line1.print("SCG");
+		line1.print("|");
 	}
-	else line1.print(engine.egtr);
-	line1.print("|");
+	else {
+#ifdef PRN_EGT
+		line1.print(engine.egtr);
+		line1.print("|");
+#endif
+	}
+	
+
+#ifdef PRN_LAMBDA
 	line1.print("llamb:");
 	if (engine.llambdaplus100 < 100) {
+#else
+	if (engine.llambdaplus100 < 100) {
+		line1.print("llamb:");
+#endif
+
 		line1.print("(");
 		line1.print(pstr_lambdaErrors(engine.llambdaplus100 - 100));
 		line1.print(")");
+		line1.print("|");
 	}
-	else line1.print((float)(engine.llambdaplus100 - 100) / 100.0);
-	line1.print("|");
+	else {
+#ifdef PRN_LAMBDA
+		line1.print((float)(engine.llambdaplus100 - 100) / 100.0);
+		line1.print("|");
+#endif
+	}
+
+
+#ifdef PRN_LAMBDA
 	
 	line1.print("lambda:");
 	if (engine.lambdaplus100 < 100) {
+
+#else
+	if (engine.lambdaplus100 < 100) {
+		line1.print("lambda:");
+#endif
+
 		line1.print("(");
 		line1.print(pstr_lambdaErrors(engine.lambdaplus100 - 100));
 		line1.print(")");
+		line1.print("|");
 	}
-	else line1.print((float)(engine.lambdaplus100 - 100) / 100.0);
+	else {
+#ifdef PRN_LAMBDA
+		line1.print((float)(engine.lambdaplus100 - 100) / 100.0);
+		line1.print("|");
+#endif
+	}
 #ifdef PRN_MOTOR1
 	
-	line1.print("|");
+	
 	line1.print("nmot:");
 	line1.print(can242.nmot / 4);
 
