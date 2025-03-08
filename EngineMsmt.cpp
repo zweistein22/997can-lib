@@ -7,7 +7,7 @@
 //#define PRN_MOTOR4
 //#define PRN_IAT_AIR
 //#define PRN_EGT
-#define PRN_LAMBDA
+//#define PRN_LAMBDA
 
 EngineMsmtU Engine;
 HeadU Head;
