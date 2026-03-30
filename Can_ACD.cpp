@@ -265,3 +265,39 @@ INT8U CAN3_get71b(long duration, ACD_V& can71b) {
 	}
 	return sndStat;
 }
+
+void handleGatewayRequest(long requestID, uint8_t* incomingData) {
+    uint8_t responseBuffer[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    bool shouldSend = false;
+
+    // Check auf Service 0x10 (Start Diagnostic Session)
+    if (incomingData[1] == 0x10) {
+        responseBuffer[0] = 0x06; // PCI: 6 Datenbytes folgen
+        responseBuffer[1] = 0x50; // Positive Response zu 0x10
+        responseBuffer[2] = incomingData[2]; // Echo der Session-Art (0x01)
+        // Timing Parameter f�r das Gateway (Standard Porsche P2/P2*)
+        responseBuffer[3] = 0x00; 
+        responseBuffer[4] = 0x32; 
+        responseBuffer[5] = 0x01; 
+        responseBuffer[6] = 0xF4;
+        shouldSend = true;
+    } 
+    // Check auf Service 0x3E (Tester Present / Keep Alive)
+    else if (incomingData[1] == 0x3E) {
+        responseBuffer[0] = 0x01; // PCI: 1 Datenbyte folgt
+        responseBuffer[1] = 0x7E; // Positive Response zu 0x3E
+        shouldSend = true;
+    }
+    // Check auf Service 0x1A (Read Identification - sehr wichtig f�r Gateway!)
+    else if (incomingData[1] == 0x1A) {
+        responseBuffer[0] = 0x03; 
+        responseBuffer[1] = 0x5A; // Positive Response zu 0x1A
+        responseBuffer[2] = incomingData[2]; // Echo des Ident-Key
+        responseBuffer[3] = 0x01; // Dummy Status
+        shouldSend = true;
+    }
+
+    if (shouldSend) {
+        CAN3.sendMsgBuf(0x764, 8, responseBuffer);
+    }
+}

@@ -8,6 +8,8 @@
 
 #define CAN_ANTRIEB_ACD_1 0x442
 #define CAN_ANTRIEB_ACD_EB1_TX 0x7FA
+#define CAN_ANTRIEB_ACD_EB1_RX 0x7F9
+#define CAN_ANTRIEB_ACD_FID_EB3_RX 0x729
 #define CAN_ANTRIEB_ACD_V 0x71B
 #define CAN_ANTRIEB_D_RS_ACD  0x6F4
 #define CAN_ANTRIEB_D_RQ_ACD 0x5F4
@@ -110,5 +112,6 @@ INT8U setMode(MCP_CAN& can, int mode);
 INT8U CAN3_get442(long duration, ACD_1& can442);
 INT8U CAN3_get71b(long duration, ACD_V& can71b);
 INT8U CAN3_get5f4_5d6(long duration, D_RQ_ACD& can5f4,D_RQ_ALL_A& can5d6);
+void handleGatewayRequest(long requestID, uint8_t* incomingData);
 #endif
 
