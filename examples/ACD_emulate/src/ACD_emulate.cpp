@@ -1,12 +1,9 @@
+ #include <Pushbutton.h>
 #include <Arduino.h>
-
-
-
-#include "PushButton.h"
 #include <CAN_ACD.h>
 
-#define PASM_A2  3  // Pasm on switch sets pin to ground with a 120Ohm resistance
-#define PASM_A5  4  // status led, set pin to ground to illuminate led, if pin is high impedance offgh, then PASM should go on.
+#define PASM_A2  3  // Pasm on switch sets pin to ground with a 120 Ohm resistance
+#define PASM_A5  4  // status led, set pin to ground to illuminate led, if pin is high impedance off
 byte rv = CAN_FAIL;
 
 
@@ -14,11 +11,13 @@ Pushbutton pasmbutton(PASM_A2);
 
 
 void PASM_LED_ON() {
-    pinMode(PASM_A5, OUTPUT);
-    digitalWrite(PASM_A5, LOW);
+  
+    digitalWrite(PASM_A5, HIGH);
+    MCP_STDERR(println("PASM_LED_ON()"));
 }
 void PASM_LED_OFF() {
-    pinMode(PASM_A5, INPUT);
+    digitalWrite(PASM_A5, LOW);
+    MCP_STDERR(println("PASM_LED_OFF()"));
 }
 
 bool pasmActive = false; 
@@ -55,6 +54,7 @@ uint8_t known_rq_rs[22][8] = {
 
 void setup() {
   // put your setup code here, to run once:
+    pinMode(PASM_A5, OUTPUT);
   acd_1.Anz_ACD_ein = 1;
   acd_1.ACD_Text = 0x02; // normal
   acd_V.AC_CAN_STAND = 1;
@@ -83,9 +83,6 @@ D_RQ_ACD d_rq_acd;
 
 D_RQ_ALL_A d_rq_all_a;
 
-int last_good_acd_status=0;
-
-
 int iloop=0;
 
 long millisV=0;
@@ -96,17 +93,16 @@ long AnzeigeOnStarted = millis();
 void loop() {
     // put your main code here, to run repeatedly:
     rv = CAN3_get5f4_5d6(30, d_rq_acd, d_rq_all_a);
-
+   // rv=0;
     if (rv == CAN_OK) {
-        if (rxId == 0x5d6) {
-
+        if (rxId == 0x5d6){
+          handleGatewayRequest(rxId, (uint8_t *)&d_rq_all_a);
         }
-        if (rxId == 0x5f4) {
-            int index = 1;
-            rv = CAN3.sendMsgBuf(CAN_ANTRIEB_D_RS_ACD, 8, (byte*)known_rq_rs[index]);
-
+          
+        if( rxId == 0x5f4) {
+        handleGatewayRequest(rxId, (uint8_t *) &d_rq_acd);
+          
         }
-
     }
     if (pasmbutton.getSingleDebouncedPress()) {
         pasmActive = !pasmActive;
@@ -139,11 +135,9 @@ void loop() {
             rv = CAN3.sendMsgBuf(CAN_ANTRIEB_ACD_1, 4, (byte*)&acd_1);
             millisI = millis();
     }
-    // CAN3_get5f4(50,d_rq_acd);
-    //CAN3_get5d6(100, d_rq_all_a);
+  
     if (millis() - millisV > 1000) {
         rv = CAN3.sendMsgBuf(CAN_ANTRIEB_ACD_V, 8, (byte*)&acd_V);
         millisV = millis();
     }
 }
-

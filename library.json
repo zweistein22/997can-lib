@@ -1,0 +1,26 @@
+{
+  "name": "997can-lib",
+  "version": "1.0.0",
+  "dependencies": [
+    {
+      "name": "MCP_CAN_lib",
+         "version": "https://github.com/coryjfowler/MCP_CAN_lib.git"
+    },
+    {
+      "name": "PString",
+      "version": "https://github.com/nmcgann/PString.git"
+    },
+    {
+      "name": "arduino-breitband-lambda",
+      "version": "https://github.com/zweistein22/arduino-breitband-lambda.git"
+    },
+    {
+      "name": "DisplayStderr",
+      "version": "https://github.com/zweistein22/CaymanGt2-lib.git"
+    }
+  ]
+}
+
+ 
+ 
+ 

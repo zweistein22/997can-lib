@@ -296,6 +296,39 @@ void handleGatewayRequest(long requestID, uint8_t* incomingData) {
         responseBuffer[3] = 0x01; // Dummy Status
         shouldSend = true;
     }
+	else if (incomingData[0] == 0x02 && incomingData[1] == 0x1A && incomingData[2] == 0x90) {
+        responseBuffer[0] = 0x04; 
+        responseBuffer[1] = 0x5A; // Positive Response zu 0x1A
+        responseBuffer[2] = incomingData[2]; // Echo des Ident-Key
+        responseBuffer[3] = 0x01; // Dummy Status
+		responseBuffer[4] = 0x00; // zero fill
+		responseBuffer[5] = 0x00; // 
+		responseBuffer[6] = 0x00; // 
+		responseBuffer[7] = 0x00; // 
+        shouldSend = true;
+    }
+
+	else if (incomingData[0] == 0x02 && incomingData[1] == 0x1A && incomingData[2] == 0x80) {
+        responseBuffer[0] = 0x03; 
+        responseBuffer[1] = 0x5A; // Positive Response zu 0x1A
+        responseBuffer[2] = incomingData[2]; // Echo des Ident-Key
+        responseBuffer[3] = 0x00; // Dummy Status
+		responseBuffer[4] = 0x00; // zero fill
+		responseBuffer[5] = 0x00; // 
+		responseBuffer[6] = 0x00; // 
+		responseBuffer[7] = 0x00; // 
+        shouldSend = true;
+    }
+
+	else {
+    // If we don't know the service, send a "Service Not Supported" NRC
+    responseBuffer[0] = 0x03; 
+    responseBuffer[1] = 0x7F; // 0x7F = Negative Response
+    responseBuffer[2] = incomingData[1]; // Echo the service ID they asked for
+    responseBuffer[3] = 0x11; // 0x11 = Service Not Supported
+		shouldSend  = true;
+	}
+
 
     if (shouldSend) {
         CAN3.sendMsgBuf(0x764, 8, responseBuffer);
